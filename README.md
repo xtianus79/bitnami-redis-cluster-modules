@@ -1,5 +1,75 @@
 <!--- app-name: Redis&reg; Cluster -->
 
+### Custom Dockerfile for the purpose of loading modules into K8s Azure, AWS or Docker Compose | Bitnami Redis Cluster version 7.2.4 12-r11
+
+The purpose of this fork is to build a Bitnami Dockerfile for the purpose deploying to a Redis Cluster in a Kubernetes K8s cluster or a Docker Compose setup. 
+
+## This bitnami Dockerfile extension serves 2 purposes. 
+
+1. Installs 2 modules for a Bitnami Helm chart installation:
+   - ReJSON
+   - module-oss (RediSearch with RSCoordinator)
+
+2. Provides a testing environment using Docker Compose for the purpose of verifying and testing the Docker build before deployment.
+   - This setup has been tested using Docker Compose.
+   - It is possible to run this setup in Docker Swarm, but it has not been tested in that way.
+
+### Run in docker compose
+
+# build the container
+
+`docker build --no-cache -t <docker image name> .`
+
+# bring up the docker compose 
+
+`docker-compose up -d`
+
+# check logs 
+
+`docker logs redis-cluster-bitnami-redis-node-0-1`
+
+# enter cluster node 0-1
+
+`docker exec -it redis-cluster-bitnami-redis-node-0-1 /bin/bash`
+
+# once inside enter nodes through an ip/localhost and bitnami password (again it's only for testing)
+
+This is for the porpose being able to utilize the -c cluster option so that the redis move operation works in the cli
+
+`redis-cli -c -h 127.0.0.1 -p 6379 -a bitnami`
+
+# bring down the docker compose and delete the volumes (this is so you don't have redis persistence when brining up and down)
+`docker compose down -v`
+
+### Build for your K8s deployment
+
+Once your happy with the build you can follow the normal bitnami instructions and deploy this to a docker repository such as Azure ACR or Docker Hub. Once it is deployed you will update your values.yaml file with at least these 2 updates
+
+# update to bitnami Healm chart values.yaml
+
+Update to the custom image
+
+```yaml
+image:
+  registry: <docker repository registry>
+  repository: <your/docker/situation>
+  tag: v1
+  digest: ""
+```
+update to load modules that will be in your container from the docker build image
+
+```yaml
+    ##
+    configmap: |
+        loadmodule /opt/bitnami/redis/etc/rejson.so
+        loadmodule /opt/bitnami/redis/etc/module-oss.so OSS_GLOBAL_PASSWORD <password>
+```
+## final thoughts
+
+The way this works is to build the modules in parts and give the Dockerfile for the purpose of making changes or adjustments as you need to. As well, the docker-compose.yml has been updated to take a custom entrypoint for the purpose of loading the modules for a docker-compose test environment. That file name is `entrypoint-custom.sh`.  
+
+This should be everything you need. Happy Charting
+
 # Bitnami package for Redis(R) Cluster
 
 Redis(R) is an open source, scalable, distributed in-memory cache for applications. It can be used to store and serve data in the form of strings, hashes, lists, sets and sorted sets.
