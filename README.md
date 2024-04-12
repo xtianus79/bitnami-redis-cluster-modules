@@ -14,7 +14,7 @@ The purpose of this fork is to build a Bitnami Dockerfile for the purpose deploy
    - This setup has been tested using Docker Compose.
    - It is possible to run this setup in Docker Swarm, but it has not been tested in that way.
 
-# Run in docker compose
+## Run in docker compose
 
 ### build the container
 
@@ -28,7 +28,7 @@ The purpose of this fork is to build a Bitnami Dockerfile for the purpose deploy
 
 `docker logs redis-cluster-bitnami-redis-node-0-1`
 
-# enter cluster node 0-1
+## enter cluster node 0-1
 
 `docker exec -it redis-cluster-bitnami-redis-node-0-1 /bin/bash`
 
@@ -41,11 +41,11 @@ This is for the porpose being able to utilize the -c cluster option so that the 
 ### bring down the docker compose and delete the volumes (this is so you don't have redis persistence when brining up and down)
 `docker compose down -v`
 
-# Build for your K8s deployment
+## Build for your K8s deployment
 
 Once your happy with the build you can follow the normal bitnami instructions and deploy this to a docker repository such as Azure ACR or Docker Hub. Once it is deployed you will update your values.yaml file with at least these 2 updates
 
-## update to bitnami Healm chart values.yaml
+### update to bitnami Healm chart values.yaml
 
 Update to the custom image
 
